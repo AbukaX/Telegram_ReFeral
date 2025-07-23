@@ -1,10 +1,14 @@
 import telebot
 from telebot import types
+import os
+from flask import Flask
+import threading
 
-# Замените на ваш токен от BotFather
-TOKEN = "8060277478:AAHvva3J3Rf85gkOz5st7BmUkGvWGdF9cRU"
+# Получаем токен из переменной окружения или используем заглушку
+TOKEN = os.environ.get('TOKEN', '8060277478:AAHvva3J3Rf85gkOz5st7BmUkGvWGdF9cRU')
 
 bot = telebot.TeleBot(TOKEN)
+app = Flask(__name__)
 
 @bot.message_handler(commands=['start'])
 def start_message(message):
@@ -47,6 +51,26 @@ def handle_callback(call):
         # Опционально: отправляем сообщение об отмене
         bot.send_message(call.message.chat.id, "Действие отменено")
 
-if __name__ == "__main__":
+# Простой веб-сервер для Render
+@app.route('/')
+def health_check():
+    return "Бот работает! 🤖"
+
+@app.route('/status')
+def status():
+    return {"status": "running", "bot": "active"}
+
+def run_bot():
+    """Запуск бота в отдельном потоке"""
     print("Бот запущен...")
-    bot.infinity_polling()
+    bot.infinity_polling(none_stop=True)
+
+if __name__ == "__main__":
+    # Запускаем бота в отдельном потоке
+    bot_thread = threading.Thread(target=run_bot)
+    bot_thread.daemon = True
+    bot_thread.start()
+    
+    # Запускаем Flask для Render (Web Service)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=False)
