@@ -1,6 +1,7 @@
 import os
 from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
+import asyncio
 
 TOKEN = os.getenv("BOT_TOKEN")
 
@@ -22,14 +23,8 @@ async def main():
     app.add_handler(CommandHandler("start", start))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
     
-    # Используем webhook для Render.com
-    PORT = int(os.environ.get('PORT', 8080))
-    await app.run_webhook(
-        listen="0.0.0.0",
-        port=PORT,
-        webhook_url=f"https://{os.environ.get('RENDER_EXTERNAL_HOSTNAME')}/{TOKEN}"
-    )
+    print("Бот запущен...")
+    await app.run_polling(drop_pending_updates=True)
 
 if __name__ == "__main__":
-    import asyncio
     asyncio.run(main())
