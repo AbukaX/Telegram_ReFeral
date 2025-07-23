@@ -1,7 +1,6 @@
 import os
 from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
-import asyncio
 
 TOKEN = os.getenv("BOT_TOKEN")
 
@@ -18,13 +17,14 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif text == "Отмена":
         await update.message.reply_text("Клавиатура скрыта", reply_markup=ReplyKeyboardRemove())
 
-async def main():
+def main():
     app = Application.builder().token(TOKEN).build()
     app.add_handler(CommandHandler("start", start))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
     
     print("Бот запущен...")
-    await app.run_polling(drop_pending_updates=True)
+    # Используем синхронную версию для Render.com
+    app.run_polling(drop_pending_updates=True)
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    main()
