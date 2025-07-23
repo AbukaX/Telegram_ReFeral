@@ -71,6 +71,13 @@ if __name__ == "__main__":
     bot_thread.daemon = True
     bot_thread.start()
     
-    # Запускаем Flask для Render (Web Service)
-    port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port, debug=False)
+    # Для локального тестирования
+    if os.environ.get('FLASK_ENV') == 'development':
+        port = int(os.environ.get('PORT', 5000))
+        app.run(host='0.0.0.0', port=port, debug=False)
+    
+# Для продакшена с Gunicorn - бот запускается автоматически при импорте
+if not __name__ == "__main__":
+    bot_thread = threading.Thread(target=run_bot)
+    bot_thread.daemon = True
+    bot_thread.start()
