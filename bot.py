@@ -5,7 +5,7 @@ from flask import Flask
 import threading
 
 # Получаем токен из переменной окружения или используем заглушку
-TOKEN = os.environ.get('TOKEN', '8060277478:AAHvva3J3Rf85gkOz5st7BmUkGvWGdF9cRU')
+TOKEN = os.environ.get('TOKEN')
 
 bot = telebot.TeleBot(TOKEN)
 app = Flask(__name__)
